@@ -1,4 +1,4 @@
-package edu.unimagdalena.RCMU;
+package edu.unimagdalena.PRCMU;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

@@ -9,7 +9,7 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>edu.unimagdalena</groupId>
-	<artifactId>RCMU</artifactId>
+	<artifactId>PRCMU</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name/>
 	<description/>

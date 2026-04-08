@@ -1,4 +1,4 @@
-package edu.unimagdalena.RCMU;
+package edu.unimagdalena.PRCMU;
 
 import org.springframework.boot.SpringApplication;
 
