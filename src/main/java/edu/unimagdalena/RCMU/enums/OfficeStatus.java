@@ -1,0 +1,7 @@
+package edu.unimagdalena.RCMU.enums;
+
+public enum OfficeStatus {
+    AVAILABLE,
+    INACTIVE,
+    MAINTENANCE
+}
