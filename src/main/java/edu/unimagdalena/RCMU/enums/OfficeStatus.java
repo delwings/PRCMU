@@ -1,4 +1,4 @@
-package edu.unimagdalena.PRCMU.enums;
+package edu.unimagdalena.RCMU.enums;
 
 public enum OfficeStatus {
     AVAILABLE,
