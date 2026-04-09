@@ -1,13 +1,1 @@
-package edu.unimagdalena.PRCMU;
-
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-
-@SpringBootApplication
-public class RcmuApplication {
-
-	public static void main(String[] args) {
-		SpringApplication.run(RcmuApplication.class, args);
-	}
-
-}
+package edu.unimagdalena.RCMU;import org.springframework.boot.SpringApplication;import org.springframework.boot.autoconfigure.SpringBootApplication;@SpringBootApplicationpublic class RcmuApplication {	public static void main(String[] args) {		SpringApplication.run(RcmuApplication.class, args);	}}
