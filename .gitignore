@@ -1,10 +1,28 @@
-HELP.md
+# --- Java & Maven ---
 target/
-.mvn/wrapper/maven-wrapper.jar
-!**/src/main/**/target/
-!**/src/test/**/target/
+*.class
+*.jar
+*.war
+*.ear
+*.log
 
-### STS ###
+# --- Maven Wrapper ---
+.mvn/
+mvnw
+mvnw.cmd
+
+# --- IntelliJ IDEA ---
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+gen/
+
+# --- VS Code ---
+.vscode/
+
+# --- STS / Eclipse ---
 .apt_generated
 .classpath
 .factorypath
@@ -13,48 +31,14 @@ target/
 .springBeans
 .sts4-cache
 
-### IntelliJ IDEA ###
-.idea
-*.iws
-*.iml
-*.ipr
-
-### NetBeans ###
-/nbproject/private/
-/nbbuild/
-/dist/
-/nbdist/
-/.nb-gradle/
+# --- NetBeans ---
+nbproject/private/
 build/
-!**/src/main/**/build/
-!**/src/test/**/build/
+nbbuild/
+dist/
+nbdist/
+.nb-gradle/
 
-### VS Code ###
-.vscode/
-
-# Compilados de Java y Maven
-target/
-*.class
-*.jar
-*.war
-*.ear
-
-# Archivos de configuración de IntelliJ IDEA
-.idea/
-*.iml
-*.iws
-*.ipr
-out/
-
-# Archivos de Maven Wrapper
-.mvn/
-mvnw
-mvnw.cmd
-
-# Logs y archivos temporales
-*.log
-tmp/
-
-# Archivos del sistema operativo
+# --- OS Files ---
 .DS_Store
 Thumbs.db

@@ -1,30 +1,1 @@
-package edu.unimagdalena.RCMU.entity;
-
-import edu.unimagdalena.RCMU.enums.PatientStatus;
-import jakarta.persistence.*;
-import lombok.*;
-
-@Entity
-@Table(name = "patients")
-@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
-public class Patient {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @Column(nullable = false, unique = true)
-    private String documentId;
-
-    @Column(nullable = false)
-    private String firstName;
-
-    @Column(nullable = false)
-    private String lastName;
-
-    @Column(nullable = false, unique = true)
-    private String email;
-
-    @Enumerated(EnumType.STRING)
-    @Builder.Default
-    private PatientStatus status = PatientStatus.ACTIVE;
-}
+package edu.unimagdalena.RCMU.entity;import edu.unimagdalena.RCMU.enums.PatientStatus;import jakarta.persistence.*;import lombok.*;@Entity@Table(name = "patients")@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builderpublic class Patient {    @Id    @GeneratedValue(strategy = GenerationType.IDENTITY)    private Long id;    @Column(nullable = false, unique = true)    private String documentId;    @Column(nullable = false)    private String firstName;    @Column(nullable = false)    private String lastName;    @Column(nullable = false, unique = true)    private String email;    @Enumerated(EnumType.STRING)    @Builder.Default    private PatientStatus status = PatientStatus.ACTIVE;}
