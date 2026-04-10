@@ -1,6 +1,7 @@
 package edu.unimagdalena.RCMU.domine.repository;
 
 import edu.unimagdalena.RCMU.domine.entity.Patient;
+import edu.unimagdalena.RCMU.domine.enums.PatientStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -9,9 +10,9 @@ import java.util.Optional;
 
 @Repository
 public interface PatientRepository extends JpaRepository<Patient, Long> {
-    // Requisito clave: Buscar por el número de documento
+    // Buscar paciente por su documento de identidad único
     Optional<Patient> findByDocumentId(String documentId);
 
-    // Buscar pacientes activos
-    List<Patient> findByStatus(Enum status); // Asegúrate de usar tu Enum de Status
+    // Filtrar pacientes por su estado actual (ACTIVE/INACTIVE)
+    List<Patient> findByStatus(PatientStatus status);
 }
