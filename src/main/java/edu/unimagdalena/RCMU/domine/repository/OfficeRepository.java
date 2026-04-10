@@ -7,5 +7,7 @@ import java.util.Optional;
 
 @Repository
 public interface OfficeRepository extends JpaRepository<Office, Long> {
+    // Para saber qué consultorios están en un piso específico o ala del hospital
     Optional<Office> findByRoomNumber(String roomNumber);
+
 }
