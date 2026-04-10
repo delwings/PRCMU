@@ -1,0 +1,1 @@
+package edu.unimagdalena.RCMU.domine.enums;public enum OfficeStatus {    AVAILABLE,    INACTIVE,    MAINTENANCE}
