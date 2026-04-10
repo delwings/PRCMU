@@ -1,0 +1,1 @@
+package edu.unimagdalena.RCMU.domine.enums;public enum DayOfWeek {    MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY, SUNDAY}
