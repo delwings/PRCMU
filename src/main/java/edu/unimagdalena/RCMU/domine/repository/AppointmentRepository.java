@@ -9,24 +9,40 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 @Repository
 public interface AppointmentRepository extends JpaRepository<Appointment, Long> {
-    // Busca el historial de citas de un paciente ordenado por fecha
-    List<Appointment> findByPatientIdOrderByDateTimeDesc(Long patientId);
 
-    boolean existsByOfficeIdAndDateTime(Long officeId, LocalDateTime dateTime);
+    // 1. Consultas Básicas y Filtros
+    List<Appointment> findByPatientIdOrderByDateTimeDesc(Long patientId);
 
     List<Appointment> findByStatus(AppointmentStatus status);
 
+    List<Appointment> findByDateTimeBetween(LocalDateTime start, LocalDateTime end);
+
+    // Mantenemos este para compatibilidad con los tests iniciales
+    boolean existsByOfficeIdAndDateTime(Long officeId, LocalDateTime dateTime);
+
+    // 2. Consultas JPQL de Negocio
     @Query("SELECT DISTINCT a.patient FROM Appointment a WHERE a.status = edu.unimagdalena.RCMU.domine.enums.AppointmentStatus.COMPLETED")
     List<Patient> findPatientsWithCompletedAppointments();
 
-    // Buscar citas por rango de fecha (Reportes)
-    List<Appointment> findByDateTimeBetween(LocalDateTime start, LocalDateTime end);
+    // NUEVAS CONSULTAS PARA REPORT SERVICE (Analytics)
 
-    // Validación de traslape para Doctor
+    // Ranking de Doctores por citas completadas (PDF 6.6)
+    @Query("SELECT a.doctor, COUNT(a) FROM Appointment a " +
+            "WHERE a.status = edu.unimagdalena.RCMU.domine.enums.AppointmentStatus.COMPLETED " +
+            "GROUP BY a.doctor ORDER BY COUNT(a) DESC")
+    List<Object[]> countCompletedAppointmentsByDoctor();
+
+    // Ranking de Pacientes por No-Show (PDF 6.5)
+    @Query("SELECT a.patient, COUNT(a) FROM Appointment a " +
+            "WHERE a.status = edu.unimagdalena.RCMU.domine.enums.AppointmentStatus.NO_SHOW " +
+            "GROUP BY a.patient ORDER BY COUNT(a) DESC")
+    List<Object[]> countNoShowsByPatient();
+
+    // 3. Validaciones de Traslape (Overlap)
+
     @Query("SELECT COUNT(a) > 0 FROM Appointment a WHERE a.doctor.id = :doctorId " +
             "AND a.status NOT IN (edu.unimagdalena.RCMU.domine.enums.AppointmentStatus.CANCELLED) " +
             "AND ((:start < a.endAt) AND (:end > a.dateTime))")
@@ -34,7 +50,6 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
                                 @Param("start") LocalDateTime start,
                                 @Param("end") LocalDateTime end);
 
-    // Validación de traslape para Consultorio
     @Query("SELECT COUNT(a) > 0 FROM Appointment a WHERE a.office.id = :officeId " +
             "AND a.status NOT IN (edu.unimagdalena.RCMU.domine.enums.AppointmentStatus.CANCELLED) " +
             "AND ((:start < a.endAt) AND (:end > a.dateTime))")
@@ -42,7 +57,6 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
                                 @Param("start") LocalDateTime start,
                                 @Param("end") LocalDateTime end);
 
-    // Validación de traslape para Paciente (Un paciente no puede cruzarse citas)
     @Query("SELECT COUNT(a) > 0 FROM Appointment a WHERE a.patient.id = :patientId " +
             "AND a.status NOT IN (edu.unimagdalena.RCMU.domine.enums.AppointmentStatus.CANCELLED) " +
             "AND ((:start < a.endAt) AND (:end > a.dateTime))")
