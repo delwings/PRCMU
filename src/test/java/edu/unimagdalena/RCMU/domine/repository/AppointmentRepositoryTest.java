@@ -34,18 +34,16 @@ class AppointmentRepositoryTest extends AbstractRepositoryIT {
 
     @BeforeEach
     void setUp() {
-        // 1. Especialidad
+
         Speciality speciality = specialityRepository.save(Speciality.builder()
                 .name("General")
                 .build());
 
-        // 2. Tipo de Cita
         defaultType = appointmentTypeRepository.save(AppointmentType.builder()
                 .name("Consulta")
                 .durationInMinutes(20)
                 .build());
 
-        // 3. Paciente (Email único con tiempo actual)
         defaultPatient = patientRepository.save(Patient.builder()
                 .documentId("DOC" + System.nanoTime())
                 .firstName("Pedro")
@@ -54,7 +52,6 @@ class AppointmentRepositoryTest extends AbstractRepositoryIT {
                 .status(PatientStatus.ACTIVE)
                 .build());
 
-        // 4. Doctor (Email único)
         defaultDoctor = doctorRepository.save(Doctor.builder()
                 .firstName("Dr")
                 .lastName("House")
@@ -63,7 +60,6 @@ class AppointmentRepositoryTest extends AbstractRepositoryIT {
                 .isActive(true)
                 .build());
 
-        // 5. Oficina (para Appointment)
         defaultOffice = officeRepository.save(Office.builder()
                 .roomNumber("OFF-" + System.nanoTime())
                 .location("Piso 1")
@@ -74,48 +70,87 @@ class AppointmentRepositoryTest extends AbstractRepositoryIT {
     @Test
     @DisplayName("JPQL: Obtener pacientes con historial de citas completadas")
     void shouldFindPatientsWithCompletedAppointments() {
+        LocalDateTime now = LocalDateTime.now();
         appointmentRepository.save(Appointment.builder()
                 .patient(defaultPatient)
                 .doctor(defaultDoctor)
                 .appointmentType(defaultType)
                 .office(defaultOffice)
                 .status(AppointmentStatus.COMPLETED)
-                .dateTime(LocalDateTime.now())
+                .dateTime(now)
+                .endAt(now.plusMinutes(20)) // endAt es obligatorio ahora
                 .build());
 
         List<Patient> result = appointmentRepository.findPatientsWithCompletedAppointments();
 
         assertThat(result).isNotEmpty();
+        assertThat(result.get(0).getDocumentId()).isEqualTo(defaultPatient.getDocumentId());
     }
 
     @Test
-    @DisplayName("Validación de disponibilidad física de consultorios")
-    void shouldCheckOfficeConflict() {
-        LocalDateTime time = LocalDateTime.of(2026, 5, 10, 8, 0);
+    @DisplayName("Validación de traslape de rango para Doctor")
+    void shouldDetectDoctorOverlapRange() {
+        LocalDateTime start = LocalDateTime.of(2026, 6, 1, 10, 0);
+        LocalDateTime end = start.plusMinutes(20);
+
+        // Guardamos una cita existente
+        appointmentRepository.save(Appointment.builder()
+                .patient(defaultPatient)
+                .doctor(defaultDoctor)
+                .appointmentType(defaultType)
+                .office(defaultOffice)
+                .dateTime(start)
+                .endAt(end)
+                .status(AppointmentStatus.SCHEDULED)
+                .build());
+
+        // Caso 1: Nuevo intento de cita que inicia justo en medio de la anterior
+        boolean hasOverlap = appointmentRepository.existsDoctorOverlap(
+                defaultDoctor.getId(),
+                start.plusMinutes(10),
+                start.plusMinutes(30)
+        );
+
+        assertThat(hasOverlap).isTrue();
+    }
+
+    @Test
+    @DisplayName("Búsqueda de citas por rango de fechas")
+    void shouldFindByDateTimeRange() {
+        LocalDateTime day1 = LocalDateTime.of(2026, 7, 1, 8, 0);
+        LocalDateTime day2 = LocalDateTime.of(2026, 7, 2, 8, 0);
 
         appointmentRepository.save(Appointment.builder()
                 .patient(defaultPatient)
                 .doctor(defaultDoctor)
                 .appointmentType(defaultType)
                 .office(defaultOffice)
-                .dateTime(time)
+                .dateTime(day1)
+                .endAt(day1.plusMinutes(20))
                 .status(AppointmentStatus.SCHEDULED)
                 .build());
 
-        boolean exists = appointmentRepository.existsByOfficeIdAndDateTime(defaultOffice.getId(), time);
-        assertThat(exists).isTrue();
+        // Buscamos solo en el rango del día 1
+        List<Appointment> results = appointmentRepository.findByDateTimeBetween(
+                day1.minusHours(1),
+                day1.plusHours(1)
+        );
+
+        assertThat(results).hasSize(1);
     }
 
     @Test
     @DisplayName("Filtrado de citas por estado de gestión")
     void shouldFindByStatus() {
+        LocalDateTime time = LocalDateTime.now().plusDays(1);
         appointmentRepository.save(Appointment.builder()
                 .patient(defaultPatient)
                 .doctor(defaultDoctor)
                 .appointmentType(defaultType)
                 .office(defaultOffice)
                 .status(AppointmentStatus.CONFIRMED)
-                .dateTime(LocalDateTime.now().plusDays(1))
+                .dateTime(time)
+                .endAt(time.plusMinutes(20))
                 .build());
 
         List<Appointment> found = appointmentRepository.findByStatus(AppointmentStatus.CONFIRMED);
