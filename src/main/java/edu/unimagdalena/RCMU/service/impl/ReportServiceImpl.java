@@ -22,30 +22,44 @@ public class ReportServiceImpl implements ReportService {
 
     @Override
     public List<DoctorProductivityResponse> getDoctorProductivity() {
-        return appointmentRepo.findAll().stream()
-                .filter(a -> a.getStatus() == AppointmentStatus.COMPLETED)
-                .collect(java.util.stream.Collectors.groupingBy(a -> a.getDoctor().getLastName(),
-                        java.util.stream.Collectors.counting()))
-                .entrySet().stream()
-                .map(entry -> new DoctorProductivityResponse(entry.getKey(), entry.getValue(), 100.0))
-                .toList();
+        // Usamos la query JPQL optimizada del repositorio
+        return appointmentRepo.countCompletedAppointmentsByDoctor().stream()
+                .map(obj -> {
+                    edu.unimagdalena.RCMU.domine.entity.Doctor d = (edu.unimagdalena.RCMU.domine.entity.Doctor) obj[0];
+                    Long count = (Long) obj[1];
+                    return new DoctorProductivityResponse(
+                            d.getFirstName() + " " + d.getLastName(),
+                            count,
+                            100.0 // Eficiencia base
+                    );
+                }).toList();
     }
 
     @Override
     public List<NoShowPatientResponse> getNoShowPatients() {
-        return appointmentRepo.findAll().stream()
-                .filter(a -> a.getStatus() == AppointmentStatus.CANCELLED)
-                .map(a -> new NoShowPatientResponse(
-                        a.getPatient().getFirstName() + " " + a.getPatient().getLastName(),
-                        a.getPatient().getDocumentId(),
-                        1L))
-                .toList();
+        // Usamos la query JPQL optimizada del repositorio para NO_SHOW (Punto 6.5)
+        return appointmentRepo.countNoShowsByPatient().stream()
+                .map(obj -> {
+                    edu.unimagdalena.RCMU.domine.entity.Patient p = (edu.unimagdalena.RCMU.domine.entity.Patient) obj[0];
+                    Long count = (Long) obj[1];
+                    return new NoShowPatientResponse(
+                            p.getFirstName() + " " + p.getLastName(),
+                            p.getDocumentId(),
+                            count
+                    );
+                }).toList();
     }
 
     @Override
     public List<OfficeOccupancyResponse> getOfficeOccupancyReport() {
         return officeRepo.findAll().stream()
-                .map(o -> new OfficeOccupancyResponse(o.getRoomNumber(), 0L, 0.0))
-                .toList();
+                .map(o -> {
+                    // Contamos citas no canceladas para este consultorio
+                    long count = appointmentRepo.findAll().stream() // O crear un countByOffice en repo
+                            .filter(a -> a.getOffice().getId().equals(o.getId()))
+                            .filter(a -> a.getStatus() != AppointmentStatus.CANCELLED)
+                            .count();
+                    return new OfficeOccupancyResponse(o.getRoomNumber(), count, count * 5.0);
+                }).toList();
     }
 }
