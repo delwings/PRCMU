@@ -4,6 +4,6 @@ import edu.unimagdalena.RCMU.api.dto.SpecialityDtos.*;
 import java.util.List;
 
 public interface SpecialityService {
-    SpecialtyResponse create(CreateSpecialityRequest req);
+    SpecialityResponse create(CreateSpecialityRequest req);
     List<SpecialityResponse> findAll();
 }
