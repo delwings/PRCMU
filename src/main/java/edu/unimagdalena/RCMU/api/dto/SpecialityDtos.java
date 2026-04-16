@@ -5,9 +5,9 @@ import jakarta.validation.constraints.Size;
 import java.io.Serializable;
 
 public class SpecialityDtos {
-    public record CreateSpecialtyRequest(
+    public record CreateSpecialityRequest(
             @NotBlank @Size(min = 3, max = 50) String name
     ) implements Serializable {}
 
-    public record SpecialtyResponse(Long id, String name) implements Serializable {}
+    public record SpecialityResponse(Long id, String name) implements Serializable {}
 }
