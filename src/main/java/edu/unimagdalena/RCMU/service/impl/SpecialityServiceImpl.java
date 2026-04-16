@@ -1,8 +1,8 @@
 package edu.unimagdalena.RCMU.services.impl;
 
 import edu.unimagdalena.RCMU.api.dto.SpecialityDtos.*;
-import edu.unimagdalena.RCMU.domine.repositories.SpecialityRepository;
-import edu.unimagdalena.RCMU.services.SpecialtyService;
+import edu.unimagdalena.RCMU.domine.repository.SpecialityRepository;
+import edu.unimagdalena.RCMU.services.SpecialityService;
 import edu.unimagdalena.RCMU.services.mapper.SpecialityMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
