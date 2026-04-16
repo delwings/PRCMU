@@ -1,4 +1,4 @@
-package edu.unimagdalena.RCMU.services.mapper;
+package edu.unimagdalena.RCMU.service.mappers;
 
 import edu.unimagdalena.RCMU.api.dto.AppointmentTypeDtos.*;
 import edu.unimagdalena.RCMU.domine.entity.AppointmentType;
@@ -8,7 +8,7 @@ public class AppointmentTypeMapper {
     public static AppointmentType toEntity(CreateAppointmentTypeRequest req) {
         return AppointmentType.builder()
                 .name(req.name())
-                .duration(req.duration())
+                .durationInMinutes(req.duration())
                 .build();
     }
 
@@ -17,12 +17,12 @@ public class AppointmentTypeMapper {
         return new AppointmentTypeResponse(
                 type.getId(),
                 type.getName(),
-                type.getDuration()
+                type.getDurationInMinutes()
         );
     }
 
     public static void patch(AppointmentType entity, CreateAppointmentTypeRequest req) {
         if (req.name() != null) entity.setName(req.name());
-        if (req.duration() != null) entity.setDuration(req.duration());
+        if (req.duration() != null) entity.setDurationInMinutes(req.duration());
     }
 }

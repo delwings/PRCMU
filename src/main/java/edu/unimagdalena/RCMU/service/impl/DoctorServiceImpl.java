@@ -1,11 +1,11 @@
-package edu.unimagdalena.RCMU.services.impl;
+package edu.unimagdalena.RCMU.service.impl;
 
 import edu.unimagdalena.RCMU.api.dto.DoctorDtos.*;
-import edu.unimagdalena.RCMU.domine.repositories.DoctorRepository;
-import edu.unimagdalena.RCMU.domine.repositories.SpecialityRepository;
+import edu.unimagdalena.RCMU.domine.repository.DoctorRepository;
+import edu.unimagdalena.RCMU.domine.repository.SpecialityRepository;
 import edu.unimagdalena.RCMU.exception.NotFoundException;
-import edu.unimagdalena.RCMU.services.DoctorService;
-import edu.unimagdalena.RCMU.services.mapper.DoctorMapper;
+import edu.unimagdalena.RCMU.service.DoctorService;
+import edu.unimagdalena.RCMU.service.mappers.DoctorMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

@@ -7,12 +7,12 @@ import edu.unimagdalena.RCMU.domine.enums.OfficeStatus;
 public class OfficeDtos {
     public record CreateOfficeRequest(
             @NotBlank String roomNumber,
-            @NotNull @Min(1) Integer floor
+            @NotNull @Min(1) String location
     ) implements Serializable {}
 
     public record UpdateOfficeRequest(@NotNull OfficeStatus status) implements Serializable {}
 
-    public record OfficeResponse(Long id, String roomNumber, Integer floor, OfficeStatus status) implements Serializable {}
+    public record OfficeResponse(Long id, String roomNumber, String location, OfficeStatus status) implements Serializable {}
 
     public record OfficeOccupancyResponse(String roomNumber, Long totalAppointments, Double occupancyPercentage) implements Serializable {}
 }

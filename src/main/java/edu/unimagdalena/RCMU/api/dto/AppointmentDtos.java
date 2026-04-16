@@ -21,6 +21,7 @@ public class AppointmentDtos {
     public record AppointmentResponse(
             Long id,
             LocalDateTime dateTime,
+            LocalDateTime endAt,
             String patientName,
             String doctorName,
             AppointmentStatus status

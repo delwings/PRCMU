@@ -1,4 +1,4 @@
-package edu.unimagdalena.RCMU.services.impl;
+package edu.unimagdalena.RCMU.service.impl;
 
 import edu.unimagdalena.RCMU.api.dto.AnalyticsDtos.AvailabilitySlotResponse;
 import edu.unimagdalena.RCMU.domine.entity.DoctorSchedule;
@@ -6,7 +6,7 @@ import edu.unimagdalena.RCMU.domine.enums.AppointmentStatus;
 import edu.unimagdalena.RCMU.domine.enums.DayOfWeek;
 import edu.unimagdalena.RCMU.domine.repository.AppointmentRepository;
 import edu.unimagdalena.RCMU.domine.repository.DoctorScheduleRepository;
-import edu.unimagdalena.RCMU.services.AvailabilityService;
+import edu.unimagdalena.RCMU.service.AvailabilityService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

@@ -1,9 +1,9 @@
-package edu.unimagdalena.RCMU.services.impl;
+package edu.unimagdalena.RCMU.service.impl;
 
 import edu.unimagdalena.RCMU.api.dto.AppointmentTypeDtos.*;
-import edu.unimagdalena.RCMU.domine.repositories.AppointmentTypeRepository;
-import edu.unimagdalena.RCMU.services.AppointmentTypeService;
-import edu.unimagdalena.RCMU.services.mapper.AppointmentTypeMapper;
+import edu.unimagdalena.RCMU.domine.repository.AppointmentTypeRepository;
+import edu.unimagdalena.RCMU.service.AppointmentTypeService;
+import edu.unimagdalena.RCMU.service.mappers.AppointmentTypeMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

@@ -1,11 +1,11 @@
-package edu.unimagdalena.RCMU.services.impl;
+package edu.unimagdalena.RCMU.service.impl;
 
 import edu.unimagdalena.RCMU.api.dto.PatientDtos.*;
 import edu.unimagdalena.RCMU.domine.entity.Patient;
-import edu.unimagdalena.RCMU.domine.repositories.PatientRepository;
+import edu.unimagdalena.RCMU.domine.repository.PatientRepository;
 import edu.unimagdalena.RCMU.exception.NotFoundException;
-import edu.unimagdalena.RCMU.services.PatientService;
-import edu.unimagdalena.RCMU.services.mapper.PatientMapper;
+import edu.unimagdalena.RCMU.service.PatientService;
+import edu.unimagdalena.RCMU.service.mappers.PatientMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

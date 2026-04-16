@@ -1,4 +1,4 @@
-package edu.unimagdalena.RCMU.services.mapper;
+package edu.unimagdalena.RCMU.service.mappers;
 
 import edu.unimagdalena.RCMU.api.dto.SpecialityDtos.*;
 import edu.unimagdalena.RCMU.domine.entity.Speciality;

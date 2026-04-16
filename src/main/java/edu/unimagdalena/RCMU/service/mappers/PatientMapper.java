@@ -1,4 +1,4 @@
-package edu.unimagdalena.RCMU.services.mapper;
+package edu.unimagdalena.RCMU.service.mappers;
 
 import edu.unimagdalena.RCMU.api.dto.PatientDtos.*;
 import edu.unimagdalena.RCMU.domine.entity.Patient;
@@ -16,7 +16,7 @@ public class PatientMapper {
     }
 
     public static PatientResponse toResponse(Patient p) {
-        return new PatientResponse(p.getId(), p.documentId(), p.getFirstName(),
+        return new PatientResponse(p.getId(), p.getDocumentId(), p.getFirstName(),
                 p.getLastName(), p.getEmail(), p.getStatus());
     }
 

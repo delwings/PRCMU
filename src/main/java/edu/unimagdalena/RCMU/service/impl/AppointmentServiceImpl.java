@@ -1,12 +1,12 @@
-package edu.unimagdalena.RCMU.services.impl;
+package edu.unimagdalena.RCMU.service.impl;
 
 import edu.unimagdalena.RCMU.api.dto.AppointmentDtos.*;
 import edu.unimagdalena.RCMU.domine.entity.*;
 import edu.unimagdalena.RCMU.domine.enums.*;
 import edu.unimagdalena.RCMU.domine.repository.*;
 import edu.unimagdalena.RCMU.exception.NotFoundException;
-import edu.unimagdalena.RCMU.services.AppointmentService;
-import edu.unimagdalena.RCMU.services.mapper.AppointmentMapper;
+import edu.unimagdalena.RCMU.service.AppointmentService;
+import edu.unimagdalena.RCMU.service.mappers.AppointmentMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -45,7 +45,7 @@ public class AppointmentServiceImpl implements AppointmentService {
         // 3. Cálculo de fin de cita (PDF 6.1)
         var type = typeRepo.findById(req.typeId())
                 .orElseThrow(() -> new NotFoundException("Appointment Type not found"));
-        LocalDateTime endAt = req.dateTime().plusMinutes(type.getDuration());
+        LocalDateTime endAt = req.dateTime().plusMinutes(type.getDurationInMinutes());
 
         // 4. Validación de Traslapes usando los nuevos métodos de rango (PDF 6.1)
         if (repo.existsDoctorOverlap(req.doctorId(), req.dateTime(), endAt))

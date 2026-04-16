@@ -1,11 +1,11 @@
-package edu.unimagdalena.RCMU.services.impl;
+package edu.unimagdalena.RCMU.service.impl;
 
 import edu.unimagdalena.RCMU.api.dto.AnalyticsDtos.*;
 import edu.unimagdalena.RCMU.api.dto.OfficeDtos.OfficeOccupancyResponse;
 import edu.unimagdalena.RCMU.domine.enums.AppointmentStatus;
-import edu.unimagdalena.RCMU.domine.repositories.AppointmentRepository;
-import edu.unimagdalena.RCMU.domine.repositories.OfficeRepository;
-import edu.unimagdalena.RCMU.services.ReportService;
+import edu.unimagdalena.RCMU.domine.repository.AppointmentRepository;
+import edu.unimagdalena.RCMU.domine.repository.OfficeRepository;
+import edu.unimagdalena.RCMU.service.ReportService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

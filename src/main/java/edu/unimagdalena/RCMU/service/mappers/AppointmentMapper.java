@@ -1,4 +1,4 @@
-package edu.unimagdalena.RCMU.services.mapper;
+package edu.unimagdalena.RCMU.service.mappers;
 
 import edu.unimagdalena.RCMU.api.dto.AppointmentDtos.*;
 import edu.unimagdalena.RCMU.domine.entity.Appointment;
@@ -10,7 +10,7 @@ public class AppointmentMapper {
         var doctorName = a.getDoctor() != null ?
                 "Dr. " + a.getDoctor().getLastName() : null;
 
-        return new AppointmentResponse(a.getId(), a.getDateTime(), patientName,
-                doctorName, a.getStatus());
+        return new AppointmentResponse(a.getId(), a.getDateTime(), a.getEndAt(),
+                patientName, doctorName, a.getStatus());
     }
 }

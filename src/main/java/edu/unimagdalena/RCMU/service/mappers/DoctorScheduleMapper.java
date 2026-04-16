@@ -1,4 +1,4 @@
-package edu.unimagdalena.RCMU.services.mapper;
+package edu.unimagdalena.RCMU.service.mappers;
 
 import edu.unimagdalena.RCMU.api.dto.DoctorScheduleDtos.*;
 import edu.unimagdalena.RCMU.domine.entity.DoctorSchedule;
@@ -9,12 +9,12 @@ public class DoctorScheduleMapper {
                 .dayOfWeek(req.dayOfWeek())
                 .startTime(req.startTime())
                 .endTime(req.endTime())
-                .active(true)
+                .isActive(true)
                 .build();
     }
 
     public static DoctorScheduleResponse toResponse(DoctorSchedule s) {
         return new DoctorScheduleResponse(s.getId(), s.getDayOfWeek(),
-                s.getStartTime(), s.getEndTime(), s.getActive());
+                s.getStartTime(), s.getEndTime(), s.getIsActive());
     }
 }

@@ -1,10 +1,10 @@
-package edu.unimagdalena.RCMU.services.impl;
+package edu.unimagdalena.RCMU.service.impl;
 
 import edu.unimagdalena.RCMU.api.dto.OfficeDtos.*;
-import edu.unimagdalena.RCMU.domine.repositories.OfficeRepository;
+import edu.unimagdalena.RCMU.domine.repository.OfficeRepository;
 import edu.unimagdalena.RCMU.exception.NotFoundException;
-import edu.unimagdalena.RCMU.services.OfficeService;
-import edu.unimagdalena.RCMU.services.mapper.OfficeMapper;
+import edu.unimagdalena.RCMU.service.OfficeService;
+import edu.unimagdalena.RCMU.service.mappers.OfficeMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

@@ -1,4 +1,4 @@
-package edu.unimagdalena.RCMU.services.mapper;
+package edu.unimagdalena.RCMU.service.mappers;
 
 import edu.unimagdalena.RCMU.api.dto.OfficeDtos.*;
 import edu.unimagdalena.RCMU.domine.entity.Office;
@@ -8,13 +8,13 @@ public class OfficeMapper {
     public static Office toEntity(CreateOfficeRequest req) {
         return Office.builder()
                 .roomNumber(req.roomNumber())
-                .floor(req.floor())
+                .location(req.location())
                 .status(OfficeStatus.AVAILABLE)
                 .build();
     }
 
     public static OfficeResponse toResponse(Office o) {
-        return new OfficeResponse(o.getId(), o.getRoomNumber(), o.getFloor(), o.getStatus());
+        return new OfficeResponse(o.getId(), o.getRoomNumber(), o.getLocation(), o.getStatus());
     }
 
     public static void patch(Office entity, UpdateOfficeRequest req) {

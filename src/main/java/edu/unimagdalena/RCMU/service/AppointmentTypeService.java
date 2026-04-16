@@ -1,4 +1,4 @@
-package edu.unimagdalena.RCMU.services;
+package edu.unimagdalena.RCMU.service;
 
 import edu.unimagdalena.RCMU.api.dto.AppointmentTypeDtos.*;
 import java.util.List;
