@@ -4,6 +4,12 @@ import edu.unimagdalena.RCMU.api.dto.AppointmentDtos.*;
 import edu.unimagdalena.RCMU.domine.entity.Appointment;
 
 public class AppointmentMapper {
+    public static Appointment toEntity(CreateAppointmentRequest req) {
+        return Appointment.builder()
+                .dateTime(req.dateTime())
+                .build();
+    }
+
     public static AppointmentResponse toResponse(Appointment a) {
         var patientName = a.getPatient() != null ?
                 a.getPatient().getFirstName() + " " + a.getPatient().getLastName() : null;
