@@ -1,0 +1,48 @@
+package edu.unimagdalena.RCMU.api;
+
+import edu.unimagdalena.RCMU.api.dto.PatientDtos.*;
+import edu.unimagdalena.RCMU.service.PatientService;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.UriComponentsBuilder;
+
+@RestController
+@RequestMapping("/api/patients")
+@RequiredArgsConstructor
+@Validated
+public class PatientController {
+
+    private final PatientService service;
+
+    @PostMapping
+    public ResponseEntity<PatientResponse> create(@Valid @RequestBody CreatePatientRequest req,
+                                                  UriComponentsBuilder uriBuilder) {
+        var created = service.create(req);
+        var location = uriBuilder.path("/api/patients/{id}").buildAndExpand(created.id()).toUri();
+        return ResponseEntity.created(location).body(created);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<PatientResponse> get(@PathVariable Long id) {
+        return ResponseEntity.ok(service.getById(id));
+    }
+
+    @GetMapping
+    public ResponseEntity<Page<PatientResponse>> list(@RequestParam(defaultValue = "0") int page,
+                                                      @RequestParam(defaultValue = "10") int size) {
+        var result = service.getAll(PageRequest.of(page, size, Sort.by("id").ascending()));
+        return ResponseEntity.ok(result);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<PatientResponse> update(@PathVariable Long id,
+                                                  @Valid @RequestBody UpdatePatientRequest req) {
+        return ResponseEntity.ok(service.update(id, req));
+    }
+}
