@@ -4,7 +4,6 @@ import edu.unimagdalena.RCMU.api.dto.AppointmentDtos.*;
 import edu.unimagdalena.RCMU.domine.entity.*;
 import edu.unimagdalena.RCMU.domine.enums.*;
 import edu.unimagdalena.RCMU.domine.repository.*;
-import edu.unimagdalena.RCMU.exception.NotFoundException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
