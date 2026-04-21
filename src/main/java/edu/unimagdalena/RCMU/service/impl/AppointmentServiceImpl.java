@@ -4,93 +4,104 @@ import edu.unimagdalena.RCMU.api.dto.AppointmentDtos.*;
 import edu.unimagdalena.RCMU.domine.entity.*;
 import edu.unimagdalena.RCMU.domine.enums.*;
 import edu.unimagdalena.RCMU.domine.repository.*;
-import edu.unimagdalena.RCMU.exception.NotFoundException;
+import edu.unimagdalena.RCMU.api.error.ResourceNotFoundException;
 import edu.unimagdalena.RCMU.service.AppointmentService;
 import edu.unimagdalena.RCMU.service.mappers.AppointmentMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import java.time.LocalDateTime;
 import java.util.List;
 
-@Service @RequiredArgsConstructor @Transactional
+@Service
+@RequiredArgsConstructor
+@Transactional
 public class AppointmentServiceImpl implements AppointmentService {
     private final AppointmentRepository repo;
     private final PatientRepository patientRepo;
     private final DoctorRepository doctorRepo;
     private final OfficeRepository officeRepo;
-    private final AppointmentTypeRepository typeRepo; // Necesaria para la duración
-    private final DoctorScheduleRepository scheduleRepo; // Necesaria para validar horario laboral
+    private final AppointmentTypeRepository typeRepo;
+    private final DoctorScheduleRepository scheduleRepo;
 
     @Override
     public AppointmentResponse schedule(CreateAppointmentRequest req) {
-        // 1. Validaciones de existencia y Estados (PDF 6.1)
         var patient = patientRepo.findById(req.patientId())
-                .orElseThrow(() -> new NotFoundException("Patient %d not found".formatted(req.patientId())));
-        if (patient.getStatus() != PatientStatus.ACTIVE) throw new IllegalStateException("Patient is not active");
-
+                .orElseThrow(() -> new ResourceNotFoundException("Patient not found"));
         var doctor = doctorRepo.findById(req.doctorId())
-                .orElseThrow(() -> new NotFoundException("Doctor %d not found".formatted(req.doctorId())));
-        if (!doctor.getIsActive()) throw new IllegalStateException("Doctor is not active");
-
+                .orElseThrow(() -> new ResourceNotFoundException("Doctor not found"));
         var office = officeRepo.findById(req.officeId())
-                .orElseThrow(() -> new NotFoundException("Office %d not found".formatted(req.officeId())));
-        if (office.getStatus() != OfficeStatus.AVAILABLE) throw new IllegalStateException("Office is not available");
+                .orElseThrow(() -> new ResourceNotFoundException("Office not found"));
+        var type = typeRepo.findById(req.typeId())
+                .orElseThrow(() -> new ResourceNotFoundException("Type not found"));
 
-        // 2. Validación de tiempo pasado
-        if (req.dateTime().isBefore(LocalDateTime.now())) {
-            throw new IllegalArgumentException("Cannot schedule an appointment in the past");
+        // Regla 6.6: Validación de Horario Laboral
+        var dayOfWeek = edu.unimagdalena.RCMU.domine.enums.DayOfWeek.valueOf(req.dateTime().getDayOfWeek().name());
+        var schedules = scheduleRepo.findByDoctorId(doctor.getId());
+
+        boolean worksThatTime = schedules.stream()
+                .filter(s -> s.getDayOfWeek() == dayOfWeek)
+                .anyMatch(s -> {
+                    var time = req.dateTime().toLocalTime();
+                    return !time.isBefore(s.getStartTime()) && !time.isAfter(s.getEndTime());
+                });
+
+        if (!worksThatTime) {
+            throw new IllegalStateException("El doctor no atiende en el horario o día seleccionado.");
         }
 
-        // 3. Cálculo de fin de cita (PDF 6.1)
-        var type = typeRepo.findById(req.typeId())
-                .orElseThrow(() -> new NotFoundException("Appointment Type not found"));
-        LocalDateTime endAt = req.dateTime().plusMinutes(type.getDurationInMinutes());
+        var entity = AppointmentMapper.toEntity(req);
+        entity.setPatient(patient);
+        entity.setDoctor(doctor);
+        entity.setOffice(office);
+        entity.setAppointmentType(type);
+        entity.setEndAt(req.dateTime().plusMinutes(type.getDurationInMinutes()));
+        entity.setStatus(AppointmentStatus.SCHEDULED);
 
-        // 4. Validación de Traslapes usando los nuevos métodos de rango (PDF 6.1)
-        if (repo.existsDoctorOverlap(req.doctorId(), req.dateTime(), endAt))
-            throw new IllegalStateException("Doctor has an overlap");
-        if (repo.existsOfficeOverlap(req.officeId(), req.dateTime(), endAt))
-            throw new IllegalStateException("Office has an overlap");
+        return AppointmentMapper.toResponse(repo.save(entity));
+    }
 
-        var appointment = Appointment.builder()
-                .dateTime(req.dateTime())
-                .endAt(endAt) // Asignamos el calculado
-                .patient(patient)
-                .doctor(doctor)
-                .office(office)
-                .appointmentType(type)
-                .status(AppointmentStatus.SCHEDULED)
-                .build();
+    @Override
+    public AppointmentResponse confirm(Long id) {
+        var a = repo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Cita no encontrada"));
+        if (a.getStatus() != AppointmentStatus.SCHEDULED)
+            throw new IllegalStateException("Solo se pueden confirmar citas programadas");
+        a.setStatus(AppointmentStatus.CONFIRMED);
+        return AppointmentMapper.toResponse(repo.save(a));
+    }
 
-        return AppointmentMapper.toResponse(repo.save(appointment));
+    @Override
+    public AppointmentResponse complete(Long id, String observations) {
+        var a = repo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Cita no encontrada"));
+        if (a.getStatus() != AppointmentStatus.CONFIRMED)
+            throw new IllegalStateException("La cita debe estar confirmada para completarse");
+        if (observations == null || observations.isBlank())
+            throw new IllegalArgumentException("Las observaciones son obligatorias para completar la cita");
+
+        a.setStatus(AppointmentStatus.COMPLETED);
+        a.setObservations(observations);
+        return AppointmentMapper.toResponse(repo.save(a));
+    }
+
+    @Override
+    public AppointmentResponse markAsNoShow(Long id) {
+        var a = repo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Cita no encontrada"));
+        a.setStatus(AppointmentStatus.NO_SHOW);
+        return AppointmentMapper.toResponse(repo.save(a));
+    }
+
+    @Override @Transactional(readOnly = true)
+    public List<AppointmentResponse> getAll() {
+        return repo.findAll().stream().map(AppointmentMapper::toResponse).toList();
     }
 
     @Override
     public void cancel(Long id, CancelAppointmentRequest req) {
-        var appointment = repo.findById(id)
-                .orElseThrow(() -> new NotFoundException("Appointment %d not found".formatted(id)));
-
-        // Validación PDF 6.3: No cancelar completadas
-        if (appointment.getStatus() == AppointmentStatus.COMPLETED)
-            throw new IllegalStateException("Cannot cancel a completed appointment");
-
-        appointment.setStatus(AppointmentStatus.CANCELLED);
-        appointment.setCancelReason(req.reason()); // Usamos el motivo obligatorio
-    }
-
-    // Métodos adicionales para cumplir con 6.2, 6.4 y 6.5
-    public void confirm(Long id) {
-        var a = repo.findById(id).orElseThrow(() -> new NotFoundException("Not found"));
-        if (a.getStatus() != AppointmentStatus.SCHEDULED) throw new IllegalStateException("Invalid state");
-        a.setStatus(AppointmentStatus.CONFIRMED);
-    }
-
-    public void complete(Long id, String observations) {
-        var a = repo.findById(id).orElseThrow(() -> new NotFoundException("Not found"));
-        if (a.getStatus() != AppointmentStatus.CONFIRMED) throw new IllegalStateException("Must be CONFIRMED");
-        a.setStatus(AppointmentStatus.COMPLETED);
-        a.setObservations(observations);
+        var a = repo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Cita no encontrada"));
+        if (a.getStatus() == AppointmentStatus.COMPLETED)
+            throw new IllegalStateException("No se puede cancelar una cita completada");
+        a.setStatus(AppointmentStatus.CANCELLED);
+        a.setCancelReason(req.reason());
+        repo.save(a);
     }
 
     @Override @Transactional(readOnly = true)
