@@ -6,6 +6,7 @@ import edu.unimagdalena.RCMU.domine.entity.DoctorSchedule;
 import edu.unimagdalena.RCMU.domine.enums.DayOfWeek;
 import edu.unimagdalena.RCMU.domine.repository.DoctorRepository;
 import edu.unimagdalena.RCMU.domine.repository.DoctorScheduleRepository;
+import edu.unimagdalena.RCMU.api.error.ResourceNotFoundException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -70,6 +71,6 @@ class DoctorScheduleServiceImplTest {
         // WHEN & THEN
         // Usamos org.assertj.core.api.Assertions.assertThatThrownBy
         org.assertj.core.api.Assertions.assertThatThrownBy(() -> service.create(req))
-                .isInstanceOf(edu.unimagdalena.RCMU.exception.NotFoundException.class);
+                .isInstanceOf(ResourceNotFoundException.class);
     }
 }
