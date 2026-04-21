@@ -3,7 +3,7 @@ package edu.unimagdalena.RCMU.service.impl;
 import edu.unimagdalena.RCMU.api.dto.DoctorScheduleDtos.*;
 import edu.unimagdalena.RCMU.domine.repository.DoctorRepository;
 import edu.unimagdalena.RCMU.domine.repository.DoctorScheduleRepository;
-import edu.unimagdalena.RCMU.exception.NotFoundException;
+import edu.unimagdalena.RCMU.api.error.ResourceNotFoundException;
 import edu.unimagdalena.RCMU.service.DoctorScheduleService;
 import edu.unimagdalena.RCMU.service.mappers.DoctorScheduleMapper;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +19,7 @@ public class DoctorScheduleServiceImpl implements DoctorScheduleService {
     @Override
     public DoctorScheduleResponse create(CreateDoctorScheduleRequest req) {
         var doctor = doctorRepo.findById(req.doctorId())
-                .orElseThrow(() -> new NotFoundException("Doctor %d not found".formatted(req.doctorId())));
+                .orElseThrow(() -> new ResourceNotFoundException("Doctor %d not found".formatted(req.doctorId())));
 
         var schedule = DoctorScheduleMapper.toEntity(req);
         schedule.setDoctor(doctor);

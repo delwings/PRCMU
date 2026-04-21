@@ -3,7 +3,7 @@ package edu.unimagdalena.RCMU.service.impl;
 import edu.unimagdalena.RCMU.api.dto.DoctorDtos.*;
 import edu.unimagdalena.RCMU.domine.repository.DoctorRepository;
 import edu.unimagdalena.RCMU.domine.repository.SpecialityRepository;
-import edu.unimagdalena.RCMU.exception.NotFoundException;
+import edu.unimagdalena.RCMU.api.error.ResourceNotFoundException;
 import edu.unimagdalena.RCMU.service.DoctorService;
 import edu.unimagdalena.RCMU.service.mappers.DoctorMapper;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +25,7 @@ public class DoctorServiceImpl implements DoctorService {
         var doctor = DoctorMapper.toEntity(req);
 
         var speciality = specialityRepo.findById(req.specialityId())
-                .orElseThrow(() -> new NotFoundException("Speciality %d not found".formatted(req.specialityId())));
+                .orElseThrow(() -> new ResourceNotFoundException("Speciality %d not found".formatted(req.specialityId())));
 
         doctor.setSpeciality(speciality);
         return DoctorMapper.toResponse(repo.save(doctor));
@@ -34,7 +34,7 @@ public class DoctorServiceImpl implements DoctorService {
     @Override
     public DoctorResponse update(Long id, UpdateDoctorRequest req) {
         var doctor = repo.findById(id)
-                .orElseThrow(() -> new NotFoundException("Doctor %d not found".formatted(id)));
+                .orElseThrow(() -> new ResourceNotFoundException("Doctor %d not found".formatted(id)));
 
         DoctorMapper.patch(doctor, req);
         return DoctorMapper.toResponse(doctor);
@@ -45,7 +45,7 @@ public class DoctorServiceImpl implements DoctorService {
     public DoctorResponse getById(Long id) {
         return repo.findById(id)
                 .map(DoctorMapper::toResponse)
-                .orElseThrow(() -> new NotFoundException("Doctor %d not found".formatted(id)));
+                .orElseThrow(() -> new ResourceNotFoundException("Doctor %d not found".formatted(id)));
     }
 
     @Override
