@@ -9,8 +9,8 @@ import edu.unimagdalena.RCMU.service.mappers.DoctorMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 @Service
 @RequiredArgsConstructor
@@ -50,9 +50,8 @@ public class DoctorServiceImpl implements DoctorService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<DoctorResponse> findAll() {
-        return repo.findAll().stream()
-                .map(DoctorMapper::toResponse)
-                .toList();
+    public Page<DoctorResponse> findAll(Pageable pageable) {
+        return repo.findAll(pageable)
+                .map(DoctorMapper::toResponse);
     }
 }
