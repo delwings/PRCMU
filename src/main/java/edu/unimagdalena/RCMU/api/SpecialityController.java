@@ -29,6 +29,6 @@ public class SpecialityController {
 
     @GetMapping
     public ResponseEntity<List<SpecialityResponse>> list() {
-        return ResponseEntity.ok(service.getAll());
+        return ResponseEntity.ok(service.findAll());
     }
 }
