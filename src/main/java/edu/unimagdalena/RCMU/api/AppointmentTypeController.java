@@ -29,6 +29,6 @@ public class AppointmentTypeController {
 
     @GetMapping
     public ResponseEntity<List<AppointmentTypeResponse>> list() {
-        return ResponseEntity.ok(service.getAll());
+        return ResponseEntity.ok(service.findAll());
     }
 }
