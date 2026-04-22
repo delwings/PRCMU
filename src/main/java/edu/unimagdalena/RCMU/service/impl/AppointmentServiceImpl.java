@@ -1,6 +1,8 @@
 package edu.unimagdalena.RCMU.service.impl;
 
 import edu.unimagdalena.RCMU.api.dto.AppointmentDtos.*;
+import edu.unimagdalena.RCMU.api.error.ConflictException;
+import edu.unimagdalena.RCMU.api.error.ValidationException;
 import edu.unimagdalena.RCMU.domine.entity.*;
 import edu.unimagdalena.RCMU.domine.enums.*;
 import edu.unimagdalena.RCMU.domine.repository.*;
@@ -34,7 +36,6 @@ public class AppointmentServiceImpl implements AppointmentService {
         var type = typeRepo.findById(req.typeId())
                 .orElseThrow(() -> new ResourceNotFoundException("Type not found"));
 
-        // Regla 6.6: Validación de Horario Laboral
         var dayOfWeek = edu.unimagdalena.RCMU.domine.enums.DayOfWeek.valueOf(req.dateTime().getDayOfWeek().name());
         var schedules = scheduleRepo.findByDoctorId(doctor.getId());
 
@@ -46,7 +47,8 @@ public class AppointmentServiceImpl implements AppointmentService {
                 });
 
         if (!worksThatTime) {
-            throw new IllegalStateException("El doctor no atiende en el horario o día seleccionado.");
+            // Ajustado a ConflictException para retornar 409
+            throw new ConflictException("El doctor no atiende en el horario o día seleccionado.");
         }
 
         var entity = AppointmentMapper.toEntity(req);
@@ -64,7 +66,7 @@ public class AppointmentServiceImpl implements AppointmentService {
     public AppointmentResponse confirm(Long id) {
         var a = repo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Cita no encontrada"));
         if (a.getStatus() != AppointmentStatus.SCHEDULED)
-            throw new IllegalStateException("Solo se pueden confirmar citas programadas");
+            throw new ConflictException("Solo se pueden confirmar citas programadas");
         a.setStatus(AppointmentStatus.CONFIRMED);
         return AppointmentMapper.toResponse(repo.save(a));
     }
@@ -73,9 +75,10 @@ public class AppointmentServiceImpl implements AppointmentService {
     public AppointmentResponse complete(Long id, String observations) {
         var a = repo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Cita no encontrada"));
         if (a.getStatus() != AppointmentStatus.CONFIRMED)
-            throw new IllegalStateException("La cita debe estar confirmada para completarse");
+            throw new ConflictException("La cita debe estar confirmada para completarse");
         if (observations == null || observations.isBlank())
-            throw new IllegalArgumentException("Las observaciones son obligatorias para completar la cita");
+            // Ajustado a ValidationException para retornar 400
+            throw new ValidationException("Las observaciones son obligatorias para completar la cita");
 
         a.setStatus(AppointmentStatus.COMPLETED);
         a.setObservations(observations);
@@ -98,7 +101,7 @@ public class AppointmentServiceImpl implements AppointmentService {
     public void cancel(Long id, CancelAppointmentRequest req) {
         var a = repo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Cita no encontrada"));
         if (a.getStatus() == AppointmentStatus.COMPLETED)
-            throw new IllegalStateException("No se puede cancelar una cita completada");
+            throw new ConflictException("No se puede cancelar una cita completada");
         a.setStatus(AppointmentStatus.CANCELLED);
         a.setCancelReason(req.reason());
         repo.save(a);
