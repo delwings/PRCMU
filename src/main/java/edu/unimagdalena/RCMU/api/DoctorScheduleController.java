@@ -23,6 +23,6 @@ public class DoctorScheduleController {
 
     @GetMapping
     public ResponseEntity<List<DoctorScheduleResponse>> listByDoctor(@PathVariable Long doctorId) {
-        return ResponseEntity.ok(service.getByDoctor(doctorId));
+        return ResponseEntity.ok(service.findByDoctorId(doctorId));
     }
 }
