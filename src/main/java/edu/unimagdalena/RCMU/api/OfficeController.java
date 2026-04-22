@@ -29,7 +29,7 @@ public class OfficeController {
 
     @GetMapping
     public ResponseEntity<List<OfficeResponse>> list() {
-        return ResponseEntity.ok(service.getAll());
+        return ResponseEntity.ok(service.findAll());
     }
 
     @PutMapping("/{id}")
