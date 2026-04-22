@@ -39,8 +39,8 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(BusinessException.class)
     public ResponseEntity<ApiError> handleBusiness(BusinessException ex, WebRequest req) {
-        var body = ApiError.of(HttpStatus.UNPROCESSABLE_ENTITY, ex.getMessage(), req.getDescription(false), List.of());
-        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(body);
+        var body = ApiError.of(HttpStatus.UNPROCESSABLE_CONTENT, ex.getMessage(), req.getDescription(false), List.of());
+        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_CONTENT).body(body);
     }
 
     @ExceptionHandler(Exception.class)
