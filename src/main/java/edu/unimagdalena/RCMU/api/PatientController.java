@@ -36,7 +36,7 @@ public class PatientController {
     @GetMapping
     public ResponseEntity<Page<PatientResponse>> list(@RequestParam(defaultValue = "0") int page,
                                                       @RequestParam(defaultValue = "10") int size) {
-        var result = service.getAll(PageRequest.of(page, size, Sort.by("id").ascending()));
+        var result = service.findAll(PageRequest.of(page, size, Sort.by("id").ascending()));
         return ResponseEntity.ok(result);
     }
 
