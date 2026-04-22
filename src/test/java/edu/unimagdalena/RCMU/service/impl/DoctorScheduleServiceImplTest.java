@@ -32,7 +32,7 @@ class DoctorScheduleServiceImplTest {
     @Test
     @DisplayName("Debe crear un horario laboral para un doctor")
     void shouldCreateDoctorSchedule() {
-        // GIVEN: Un request para lunes de 8am a 12pm
+        // GIVEN
         Long doctorId = 1L;
         var req = new CreateDoctorScheduleRequest(
                 doctorId,
@@ -44,20 +44,20 @@ class DoctorScheduleServiceImplTest {
         var doctor = Doctor.builder().id(doctorId).lastName("House").build();
         when(doctorRepo.findById(doctorId)).thenReturn(Optional.of(doctor));
 
-        // Mock del save: capturamos lo que se intenta guardar
         when(repo.save(any(DoctorSchedule.class))).thenAnswer(invocation -> {
             DoctorSchedule s = invocation.getArgument(0);
-            s.setId(100L); // Simulamos ID generado
+            s.setId(100L);
             return s;
         });
 
-        // WHEN
-        var res = service.create(req);
+        // WHEN: Se añade el parámetro doctorId a la llamada
+        var res = service.create(doctorId, req);
 
         // THEN
         assertThat(res).isNotNull();
         assertThat(res.id()).isEqualTo(100L);
         assertThat(res.dayOfWeek()).isEqualTo(DayOfWeek.MONDAY);
+        verify(doctorRepo).findById(doctorId);
         verify(repo).save(any(DoctorSchedule.class));
     }
 
@@ -65,12 +65,12 @@ class DoctorScheduleServiceImplTest {
     @DisplayName("Debe fallar si el doctor no existe al crear horario")
     void shouldThrowExceptionWhenDoctorNotFound() {
         // GIVEN
-        when(doctorRepo.findById(anyLong())).thenReturn(Optional.empty());
-        var req = new CreateDoctorScheduleRequest(99L, DayOfWeek.FRIDAY, LocalTime.MIN, LocalTime.MAX);
+        Long invalidDoctorId = 99L;
+        when(doctorRepo.findById(invalidDoctorId)).thenReturn(Optional.empty());
+        var req = new CreateDoctorScheduleRequest(invalidDoctorId, DayOfWeek.FRIDAY, LocalTime.MIN, LocalTime.MAX);
 
-        // WHEN & THEN
-        // Usamos org.assertj.core.api.Assertions.assertThatThrownBy
-        org.assertj.core.api.Assertions.assertThatThrownBy(() -> service.create(req))
+        // WHEN & THEN: Se añade el parámetro invalidDoctorId a la llamada
+        org.assertj.core.api.Assertions.assertThatThrownBy(() -> service.create(invalidDoctorId, req))
                 .isInstanceOf(ResourceNotFoundException.class);
     }
 }
