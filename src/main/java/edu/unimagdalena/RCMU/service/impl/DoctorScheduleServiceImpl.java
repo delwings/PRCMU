@@ -11,15 +11,17 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
-@Service @RequiredArgsConstructor @Transactional
+@Service
+@RequiredArgsConstructor
+@Transactional
 public class DoctorScheduleServiceImpl implements DoctorScheduleService {
     private final DoctorScheduleRepository repo;
     private final DoctorRepository doctorRepo;
 
     @Override
-    public DoctorScheduleResponse create(CreateDoctorScheduleRequest req) {
-        var doctor = doctorRepo.findById(req.doctorId())
-                .orElseThrow(() -> new ResourceNotFoundException("Doctor %d not found".formatted(req.doctorId())));
+    public DoctorScheduleResponse create(Long doctorId, CreateDoctorScheduleRequest req) {
+        var doctor = doctorRepo.findById(doctorId)
+                .orElseThrow(() -> new ResourceNotFoundException("Doctor %d not found".formatted(doctorId)));
 
         var schedule = DoctorScheduleMapper.toEntity(req);
         schedule.setDoctor(doctor);
