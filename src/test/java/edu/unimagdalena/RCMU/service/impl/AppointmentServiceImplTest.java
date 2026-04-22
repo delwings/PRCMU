@@ -1,6 +1,8 @@
 package edu.unimagdalena.RCMU.service.impl;
 
 import edu.unimagdalena.RCMU.api.dto.AppointmentDtos.*;
+import edu.unimagdalena.RCMU.api.error.ConflictException; // Importado
+import edu.unimagdalena.RCMU.api.error.ResourceNotFoundException;
 import edu.unimagdalena.RCMU.domine.entity.*;
 import edu.unimagdalena.RCMU.domine.enums.*;
 import edu.unimagdalena.RCMU.domine.repository.*;
@@ -38,12 +40,11 @@ class AppointmentServiceImplTest {
     void shouldThrowExceptionWhenDoctorDoesNotWorkAtThatTime() {
         // GIVEN
         LocalDateTime start = LocalDateTime.now().plusDays(1).withHour(10).withMinute(0);
-        var req = new CreateAppointmentRequest(start, 1L, 1L, 1L, 1L);
+        var req = new CreateAppointmentRequest(1L, 1L, 1L, start, 1L); // Corregido orden de argumentos
 
         var type = AppointmentType.builder().durationInMinutes(30).build();
         setupMocks(type);
 
-        // Mockeamos un horario que NO coincida (ej: atiende de 14:00 a 18:00)
         var schedule = DoctorSchedule.builder()
                 .dayOfWeek(DayOfWeek.valueOf(start.getDayOfWeek().name()))
                 .startTime(LocalTime.of(14, 0))
@@ -51,9 +52,9 @@ class AppointmentServiceImplTest {
                 .build();
         when(scheduleRepo.findByDoctorId(1L)).thenReturn(List.of(schedule));
 
-        // WHEN & THEN
+        // WHEN & THEN - Cambiado a ConflictException
         assertThatThrownBy(() -> service.schedule(req))
-                .isInstanceOf(IllegalStateException.class)
+                .isInstanceOf(ConflictException.class)
                 .hasMessageContaining("El doctor no atiende");
     }
 
@@ -62,12 +63,11 @@ class AppointmentServiceImplTest {
     void shouldCalculateEndAtAndSaveAppointment() {
         // GIVEN
         LocalDateTime start = LocalDateTime.now().plusDays(1).withHour(10).withMinute(0);
-        var req = new CreateAppointmentRequest(start, 1L, 1L, 1L, 1L);
+        var req = new CreateAppointmentRequest(1L, 1L, 1L, start, 1L);
 
         var type = AppointmentType.builder().id(1L).durationInMinutes(30).build();
         setupMocks(type);
 
-        // Mockeamos un horario laboral VÁLIDO para que pase la validación 6.6
         var schedule = DoctorSchedule.builder()
                 .dayOfWeek(DayOfWeek.valueOf(start.getDayOfWeek().name()))
                 .startTime(LocalTime.of(8, 0))
@@ -120,7 +120,7 @@ class AppointmentServiceImplTest {
     @Test
     @DisplayName("6.4: Completar cita con observaciones")
     void shouldCompleteAppointment() {
-        // GIVEN: Una cita confirmada (según flujo PDF)
+        // GIVEN
         var appointment = Appointment.builder().id(5L).status(AppointmentStatus.CONFIRMED).build();
         when(repo.findById(5L)).thenReturn(Optional.of(appointment));
         when(repo.save(any())).thenAnswer(i -> i.getArgument(0));
