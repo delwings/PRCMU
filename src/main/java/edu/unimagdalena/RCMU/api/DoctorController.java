@@ -36,7 +36,7 @@ public class DoctorController {
     @GetMapping
     public ResponseEntity<Page<DoctorResponse>> list(@RequestParam(defaultValue = "0") int page,
                                                      @RequestParam(defaultValue = "10") int size) {
-        return ResponseEntity.ok(service.getAll(PageRequest.of(page, size, Sort.by("id").ascending())));
+        return ResponseEntity.ok(service.findAll(PageRequest.of(page, size, Sort.by("id").ascending())));
     }
 
     @PutMapping("/{id}")
