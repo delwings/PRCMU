@@ -40,7 +40,7 @@ class AppointmentServiceImplTest {
     void shouldThrowExceptionWhenDoctorDoesNotWorkAtThatTime() {
         // GIVEN
         LocalDateTime start = LocalDateTime.now().plusDays(1).withHour(10).withMinute(0);
-        var req = new CreateAppointmentRequest(1L, 1L, 1L, start, 1L); // Corregido orden de argumentos
+        var req = new CreateAppointmentRequest(start, 1L, 1L, 1L, 1L); // Corregido orden de argumentos
 
         var type = AppointmentType.builder().durationInMinutes(30).build();
         setupMocks(type);
@@ -63,7 +63,7 @@ class AppointmentServiceImplTest {
     void shouldCalculateEndAtAndSaveAppointment() {
         // GIVEN
         LocalDateTime start = LocalDateTime.now().plusDays(1).withHour(10).withMinute(0);
-        var req = new CreateAppointmentRequest(1L, 1L, 1L, start, 1L);
+        var req = new CreateAppointmentRequest(start, 1L, 1L, 1L, 1L);
 
         var type = AppointmentType.builder().id(1L).durationInMinutes(30).build();
         setupMocks(type);
